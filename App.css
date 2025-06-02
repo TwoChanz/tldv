@@ -1,0 +1,93 @@
+.app {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: sans-serif;
+  color: #fff;
+  background: #1a1a1a;
+  border-radius: 8px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+}
+
+button {
+  padding: 10px 18px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  background: #646cff;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.summary-box {
+  background: #333;
+  padding: 16px;
+  margin-top: 20px;
+  border-radius: 6px;
+}
+
+.summary-text {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.error {
+  color: #ff6b6b;
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.loading {
+  color: #f5c842;
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.buttons {
+  margin-top: 16px;
+}
+.copied-msg {
+  display: inline-block;
+  margin-left: 10px;
+  font-weight: bold;
+  color: #4ade80; /* green-500 */
+}
+.video-preview {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  background: #252525;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.video-preview img {
+  width: 120px;
+  height: auto;
+  border-radius: 4px;
+  margin-right: 12px;
+}
+
+.video-details h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.video-details p {
+  color: #bbb;
+  margin-top: 4px;
+}
