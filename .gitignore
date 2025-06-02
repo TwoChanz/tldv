@@ -1,0 +1,15 @@
+# 🔒 Secrets
+.env
+.env.*
+
+# 🐍 Python
+venv/
+__pycache__/
+*.pyc
+
+# 📦 Node
+node_modules/
+dist/
+
+# 💻 System
+.DS_Store
