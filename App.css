@@ -121,3 +121,42 @@ button {
   color: var(--preview-sub);
   margin-top: 4px;
 }
+
+.theme-toggle {
+  cursor: pointer;
+  position: relative;
+  font-size: 1.5rem;
+  margin-left: 10px;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.2);
+}
+
+.theme-toggle .icon {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tooltip {
+  visibility: hidden;
+  background-color: #444;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 6px 10px;
+  position: absolute;
+  z-index: 1;
+  top: -38px;
+  right: -20px;
+  opacity: 0;
+  font-size: 0.75rem;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+
+.theme-toggle:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
