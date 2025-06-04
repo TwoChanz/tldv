@@ -41,7 +41,8 @@ function App() {
   };
 
   const downloadFile = (ext) => {
-    const blob = new Blob([summary], { type: 'text/plain;charset=utf-8' });
+    const mime = ext === 'md' ? 'text/markdown' : 'text/plain';
+    const blob = new Blob([summary], { type: `${mime};charset=utf-8` });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `summary.${ext}`;
@@ -92,8 +93,12 @@ function App() {
           <h2>Summary</h2>
           <div className="summary-text">{summary}</div>
           <div className="buttons">
-            <button onClick={() => downloadFile('txt')}>⬇️ Export .txt</button>
-            <button onClick={() => downloadFile('md')}>⬇️ Export .md</button>
+            <button className="download-btn" onClick={() => downloadFile('txt')}>
+              ⬇️ Download TXT
+            </button>
+            <button className="download-btn" onClick={() => downloadFile('md')}>
+              ⬇️ Download MD
+            </button>
             <button onClick={copyToClipboard}>📋 Copy to Clipboard</button>
             {copied && <span className="copied-msg">✅ Copied!</span>}
           </div>

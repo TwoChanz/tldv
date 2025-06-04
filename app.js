@@ -57,9 +57,10 @@ app.post("/summarize", async (req, res) => {
   try {
     transcriptText = await fetchAnyTranscript(videoId);
   } catch (err) {
-    return res
-      .status(400)
-      .json({ error: "No transcript available for this video." });
+    console.error("Transcript fetch error:", err);
+    return res.status(400).json({
+      error: "\u26A0\uFE0F Transcript not found or video is private.",
+    });
   }
 
   // 2) Send it to OpenAI for summarization
