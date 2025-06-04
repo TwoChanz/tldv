@@ -73,7 +73,8 @@ app.post("/summarize", async (req, res) => {
     // 2) Send to OpenAI for summarization
     console.log('Sending to OpenAI for summarization...');
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Using more cost-effective model
+      // Use the latest cost-effective GPT-4 Turbo model
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
