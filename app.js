@@ -46,7 +46,14 @@ app.post("/summarize", async (req, res) => {
 
   let videoId;
   try {
-    videoId = new URL(url).searchParams.get("v");
+    const parsed = new URL(url);
+    videoId = parsed.searchParams.get("v");
+    if (!videoId && parsed.hostname.includes("youtu.be")) {
+      videoId = parsed.pathname.replace(/^\//, "");
+    }
+    if (!videoId && parsed.pathname.startsWith("/embed/")) {
+      videoId = parsed.pathname.split("/embed/")[1];
+    }
   } catch {
     return res.status(400).json({ error: "Invalid YouTube URL." });
   }
