@@ -34,4 +34,5 @@ TLDV helps users digest long-form video content quickly by generating:
 - Paste YouTube URL
 - AI transcript summarization
 - Key takeaways with timestamp support
+- Video metadata preview (title, channel, thumbnail)
 - Error handling and loading state

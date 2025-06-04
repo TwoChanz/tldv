@@ -9,11 +9,36 @@ function App() {
   const [copied, setCopied] = useState(false);
   const [videoInfo, setVideoInfo] = useState(null);
 
+  const handlePreview = async () => {
+    if (!videoUrl) return;
+    try {
+      new URL(videoUrl);
+    } catch {
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:4000/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: videoUrl }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setVideoInfo(data.video);
+      } else {
+        setVideoInfo(null);
+      }
+    } catch {
+      // ignore connection errors for preview
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSummary('');
-    setVideoInfo(null);
     setError('');
     setCopied(false);
 
@@ -67,6 +92,7 @@ function App() {
           placeholder="Paste YouTube URL here"
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
+          onBlur={handlePreview}
           required
         />
         <button type="submit" disabled={loading}>
@@ -82,7 +108,10 @@ function App() {
           <img src={videoInfo.thumbnail} alt="thumbnail" />
           <div className="video-details">
             <h2>{videoInfo.title}</h2>
-            <p>🕒 Duration: {videoInfo.duration.replace('PT', '')}</p>
+            <p>📺 {videoInfo.author}</p>
+            {videoInfo.duration && (
+              <p>🕒 Duration: {videoInfo.duration.replace('PT', '')}</p>
+            )}
           </div>
         </div>
       )}
