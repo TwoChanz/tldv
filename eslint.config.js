@@ -30,4 +30,12 @@ export default [
       ],
     },
   },
+  {
+    files: ['app.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
 ]

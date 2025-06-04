@@ -75,3 +75,16 @@ Submit a POST request to `/summarize` with JSON:
 ```json
 { "url": "https://www.youtube.com/watch?v=VIDEO_ID" }
 ```
+
+---
+
+## 🚀 Development
+
+To start both the backend and frontend together, run:
+
+```bash
+npm run dev
+```
+
+This command launches the `backend` and `frontend` scripts in parallel using
+`concurrently`.
