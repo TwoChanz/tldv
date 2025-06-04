@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { formatTimestamp } from './utils.js';
 import './App.css';
 
 function App() {
@@ -8,6 +9,18 @@ function App() {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const [videoInfo, setVideoInfo] = useState(null);
+  const [pastSummaries, setPastSummaries] = useState([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('tldv_summaries');
+    if (stored) {
+      try {
+        setPastSummaries(JSON.parse(stored));
+      } catch {
+        // ignore parse errors
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +43,7 @@ function App() {
       if (res.ok) {
         setSummary(data.summary);
         setVideoInfo(data.video);
+        saveSummary(videoUrl, data.summary);
       } else {
         setError(data.error || 'Something went wrong.');
       }
@@ -56,6 +70,31 @@ function App() {
     } catch (err) {
       console.error('Clipboard copy failed:', err);
     }
+  };
+
+  const saveSummary = (videoUrlToSave, text) => {
+    const newEntry = {
+      videoUrl: videoUrlToSave,
+      summary: text,
+      timestamp: Date.now(),
+    };
+    const existing = (() => {
+      try {
+        return JSON.parse(localStorage.getItem('tldv_summaries')) || [];
+      } catch {
+        return [];
+      }
+    })();
+    const updated = [newEntry, ...existing].slice(0, 10);
+    localStorage.setItem('tldv_summaries', JSON.stringify(updated));
+    setPastSummaries(updated);
+  };
+
+  const viewPastSummary = (entry) => {
+    setSummary(entry.summary);
+    setVideoUrl(entry.videoUrl);
+    setVideoInfo(null);
+    setError('');
   };
 
   return (
@@ -97,6 +136,23 @@ function App() {
             <button onClick={copyToClipboard}>📋 Copy to Clipboard</button>
             {copied && <span className="copied-msg">✅ Copied!</span>}
           </div>
+        </div>
+      )}
+
+      {pastSummaries.length > 0 && (
+        <div className="past-summaries">
+          <h2>📚 Past Summaries</h2>
+          {pastSummaries.map((item, idx) => (
+            <div key={idx} className="past-summary-item">
+              <div>
+                <a href={item.videoUrl} target="_blank" rel="noopener noreferrer">
+                  {item.videoUrl}
+                </a>
+                <span className="past-date">{formatTimestamp(item.timestamp)}</span>
+              </div>
+              <button onClick={() => viewPastSummary(item)}>View</button>
+            </div>
+          ))}
         </div>
       )}
     </div>
