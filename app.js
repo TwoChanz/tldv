@@ -1,99 +1,136 @@
-// File: backend/app.js
+import express from 'express';
+import cors from 'cors';
+import { config } from 'dotenv';
+import OpenAI from 'openai';
+import { YoutubeTranscript } from 'youtube-transcript';
 
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const { getTranscript } = require("youtube-transcript");
-const { getSubtitles } = require("youtube-captions-scraper");
-const { OpenAI } = require("openai");
-
-dotenv.config();
+// Load environment variables
+config();
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY 
+});
 
 /**
- * Try owner-uploaded captions first (youtube-transcript), 
- * then fall back to auto-generated English captions (youtube-captions-scraper).
- * Throws if neither exists.
+ * Extract video ID from YouTube URL
  */
-async function fetchAnyTranscript(videoId) {
-  // 1) Try owner‐uploaded captions
+function extractVideoId(url) {
   try {
-    const ownerTranscript = await getTranscript(videoId);
-    return ownerTranscript.map((chunk) => chunk.text).join(" ");
-  } catch (ownerErr) {
-    console.log(
-      `Owner captions not found for ${videoId}. Falling back to auto-generated.`
-    );
-    // 2) Fallback to auto-generated English
-    const autoCaps = await getSubtitles({ videoID: videoId, lang: "en" });
-    if (!autoCaps || autoCaps.length === 0) {
-      throw new Error("No transcript available");
-    }
-    return autoCaps.map((chunk) => chunk.text).join(" ");
+    const urlObj = new URL(url);
+    return urlObj.searchParams.get("v") || 
+           urlObj.pathname.split('/').pop(); // Handle youtu.be links
+  } catch {
+    return null;
   }
 }
 
+/**
+ * Fetch transcript using youtube-transcript
+ */
+async function fetchTranscript(videoId) {
+  try {
+    const transcript = await YoutubeTranscript.fetchTranscript(videoId);
+    return transcript.map(chunk => chunk.text).join(" ");
+  } catch (error) {
+    throw new Error(`No transcript available: ${error.message}`);
+  }
+}
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'TLDV backend is running' });
+});
+
+// Main summarize endpoint
 app.post("/summarize", async (req, res) => {
   const { url } = req.body;
-  if (!url) return res.status(400).json({ error: "Missing YouTube URL." });
+  
+  if (!url) {
+    return res.status(400).json({ error: "Missing YouTube URL." });
+  }
 
-  let videoId;
-  try {
-    videoId = new URL(url).searchParams.get("v");
-  } catch {
+  // Extract video ID
+  const videoId = extractVideoId(url);
+  if (!videoId) {
     return res.status(400).json({ error: "Invalid YouTube URL." });
   }
-  if (!videoId) return res.status(400).json({ error: "Invalid YouTube URL." });
 
-  // 1) Fetch transcript (owner OR auto-generated)
-  let transcriptText;
   try {
-    transcriptText = await fetchAnyTranscript(videoId);
-  } catch (err) {
-    return res
-      .status(400)
-      .json({ error: "No transcript available for this video." });
-  }
+    // 1) Fetch transcript
+    console.log(`Fetching transcript for video: ${videoId}`);
+    const transcriptText = await fetchTranscript(videoId);
+    
+    if (!transcriptText || transcriptText.trim().length === 0) {
+      return res.status(400).json({ error: "No transcript content found." });
+    }
 
-  // 2) Send it to OpenAI for summarization
-  try {
+    // 2) Send to OpenAI for summarization
+    console.log('Sending to OpenAI for summarization...');
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-4o-mini", // Using more cost-effective model
       messages: [
         {
           role: "system",
-          content:
-            "You summarize YouTube transcripts into concise summaries with bullet points and timestamps when available.",
+          content: `You are a helpful assistant that creates concise, well-structured summaries of YouTube video transcripts. 
+
+Format your response as:
+## Summary
+[2-3 sentence overview]
+
+## Key Points
+• [Main point 1]
+• [Main point 2] 
+• [Main point 3]
+
+## Takeaways
+• [Actionable insight 1]
+• [Actionable insight 2]`
         },
         {
           role: "user",
-          content: `Here is the transcript:\n\n${transcriptText}`,
+          content: `Please summarize this YouTube video transcript:\n\n${transcriptText.slice(0, 8000)}` // Limit length
         },
       ],
-      temperature: 0.5,
+      temperature: 0.7,
+      max_tokens: 800
     });
 
     const summary = completion.choices[0].message.content;
-    res.json({ summary });
-  } catch (openAiErr) {
-    console.error("OpenAI error:", openAiErr);
-    if (openAiErr.code === "context_length_exceeded") {
+    
+    res.json({ 
+      summary,
+      videoId,
+      transcriptLength: transcriptText.length 
+    });
+
+  } catch (error) {
+    console.error("Error processing request:", error);
+    
+    if (error.message.includes('transcript')) {
       return res.status(400).json({
-        error:
-          "Transcript too long for this model’s context window. Try a shorter video or trim the transcript.",
+        error: "No transcript available for this video. The video may not have captions enabled."
       });
     }
-    res.status(500).json({ error: "OpenAI request failed." });
+    
+    if (error.code === "context_length_exceeded") {
+      return res.status(400).json({
+        error: "Video transcript is too long. Try a shorter video."
+      });
+    }
+    
+    res.status(500).json({ 
+      error: "Failed to process video. Please try again." 
+    });
   }
 });
 
 app.listen(PORT, () => {
   console.log(`✅ TLDV backend running at http://localhost:${PORT}`);
+  console.log(`📋 Health check: http://localhost:${PORT}/health`);
 });
