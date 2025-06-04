@@ -91,3 +91,24 @@ button {
   color: #bbb;
   margin-top: 4px;
 }
+
+[data-theme='light'] .app {
+  background: #f9f9f9;
+  color: #213547;
+}
+
+[data-theme='light'] .summary-box {
+  background: #f0f0f0;
+}
+
+[data-theme='light'] .video-preview {
+  background: #eaeaea;
+}
+
+[data-theme='light'] .video-details h2 {
+  color: #213547;
+}
+
+[data-theme='light'] .video-details p {
+  color: #555;
+}
