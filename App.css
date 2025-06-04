@@ -1,10 +1,38 @@
+:root {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --card: #f3f3f3;
+  --button-bg: #646cff;
+  --button-text: white;
+  --error: #b00020;
+  --loading: #f5c842;
+  --success: #4ade80;
+  --preview-bg: #efefef;
+  --preview-title: #1a1a1a;
+  --preview-sub: #555;
+}
+
+[data-theme='dark'] {
+  --bg: #1a1a1a;
+  --text: #ffffff;
+  --card: #333;
+  --button-bg: #646cff;
+  --button-text: white;
+  --error: #ff6b6b;
+  --loading: #f5c842;
+  --success: #4ade80;
+  --preview-bg: #252525;
+  --preview-title: #ffffff;
+  --preview-sub: #bbb;
+}
+
 .app {
   max-width: 700px;
   margin: 40px auto;
   padding: 20px;
   font-family: sans-serif;
-  color: #fff;
-  background: #1a1a1a;
+  color: var(--text);
+  background: var(--bg);
   border-radius: 8px;
 }
 
@@ -22,14 +50,14 @@ button {
   font-size: 1rem;
   border: none;
   border-radius: 6px;
-  background: #646cff;
-  color: white;
+  background: var(--button-bg);
+  color: var(--button-text);
   cursor: pointer;
   margin-right: 10px;
 }
 
 .summary-box {
-  background: #333;
+  background: var(--card);
   padding: 16px;
   margin-top: 20px;
   border-radius: 6px;
@@ -45,13 +73,13 @@ button {
 }
 
 .error {
-  color: #ff6b6b;
+  color: var(--error);
   font-weight: bold;
   margin-top: 12px;
 }
 
 .loading {
-  color: #f5c842;
+  color: var(--loading);
   font-weight: bold;
   margin-top: 12px;
 }
@@ -59,17 +87,19 @@ button {
 .buttons {
   margin-top: 16px;
 }
+
 .copied-msg {
   display: inline-block;
   margin-left: 10px;
   font-weight: bold;
-  color: #4ade80; /* green-500 */
+  color: var(--success);
 }
+
 .video-preview {
   display: flex;
   align-items: center;
   margin-top: 20px;
-  background: #252525;
+  background: var(--preview-bg);
   padding: 12px;
   border-radius: 6px;
 }
@@ -84,10 +114,10 @@ button {
 .video-details h2 {
   margin: 0;
   font-size: 1.1rem;
-  color: #fff;
+  color: var(--preview-title);
 }
 
 .video-details p {
-  color: #bbb;
+  color: var(--preview-sub);
   margin-top: 4px;
 }
