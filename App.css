@@ -91,3 +91,29 @@ button {
   color: #bbb;
   margin-top: 4px;
 }
+
+.past-summaries {
+  margin-top: 30px;
+}
+
+.past-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #252525;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.past-summary-item a {
+  color: #646cff;
+  word-break: break-all;
+}
+
+.past-date {
+  display: block;
+  color: #bbb;
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
