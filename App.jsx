@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -8,6 +8,24 @@ function App() {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const [videoInfo, setVideoInfo] = useState(null);
+
+  const getPreferredTheme = () => {
+    const stored = localStorage.getItem('theme');
+    if (stored) return stored;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  };
+
+  const [theme, setTheme] = useState(getPreferredTheme);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () =>
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,12 +77,16 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <h1>TLDV — YouTube AI Summarizer</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Paste YouTube URL here"
+    <>
+      <button className="theme-toggle" onClick={toggleTheme}>
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
+      <div className="app">
+        <h1>TLDV — YouTube AI Summarizer</h1>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Paste YouTube URL here"
           value={videoUrl}
           onChange={(e) => setVideoUrl(e.target.value)}
           required
@@ -99,7 +121,8 @@ function App() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 

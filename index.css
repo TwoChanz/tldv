@@ -66,3 +66,24 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.theme-toggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+[data-theme='light'] {
+  color: #213547;
+  background-color: #ffffff;
+}
+[data-theme='light'] a:hover {
+  color: #747bff;
+}
+[data-theme='light'] button {
+  background-color: #f9f9f9;
+}
