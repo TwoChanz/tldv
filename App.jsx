@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -8,6 +8,21 @@ function App() {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const [videoInfo, setVideoInfo] = useState(null);
+  const [theme, setTheme] = useState('dark');
+  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +32,7 @@ function App() {
     setError('');
     setCopied(false);
 
-    console.log("✅ Sending URL to backend:", videoUrl); // <== LOGGING HERE
+    console.log('✅ Sending URL to backend:', videoUrl);
 
     try {
       const res = await fetch('http://localhost:4000/summarize', {
@@ -58,9 +73,25 @@ function App() {
     }
   };
 
+  const themeTooltip = theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+
   return (
     <div className="app">
-      <h1>TLDV — YouTube AI Summarizer</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>TLDV — YouTube AI Summarizer</h1>
+        <div
+          className="theme-toggle"
+          onClick={toggleTheme}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
+          <span className="tooltip">{themeTooltip}</span>
+          <span className="icon">
+            {theme === 'dark' ? (hovered ? '🌞' : '🌙') : (hovered ? '🌙' : '🌞')}
+          </span>
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
